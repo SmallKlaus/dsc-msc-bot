@@ -145,7 +145,10 @@ client.on("interactionCreate", async interaction=>{
     {
         if (!interaction.member.voice.channel) return interaction.reply("Get your ass into a voice channel!!")
 
-        const queue = await client.player.createQueue(interaction.guild)
+        const queue = await client.player.createQueue(interaction.guild, {
+		metadata: interaction.channel,
+		autoSelfDeaf: false
+	})
         if(!queue.connection) await queue.connect(interaction.member.voice.channel)
 
         let embed = new EmbedBuilder()
