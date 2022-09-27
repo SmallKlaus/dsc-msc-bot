@@ -88,7 +88,12 @@ const commands = [
     //skip command
     new SlashCommandBuilder()
         .setName("skip")
-        .setDescription("hops to the following chant")
+        .setDescription("hops to the following chant"),
+    //delete command
+    new SlashCommandBuilder()
+        .setName("delete")
+        .setDescription("makes the chosen chant scarce")
+        .addNumberOption((option) => option.setName("song").setDescription("Chant number in the queue").setMinValue(1))
 
 ].map(command =>command.toJSON());
 
@@ -140,7 +145,10 @@ client.on("interactionCreate", async interaction=>{
     {
         if (!interaction.member.voice.channel) return interaction.reply("Get your ass into a voice channel!!")
 
-        const queue = await client.player.createQueue(interaction.guild)
+        const queue = await client.player.createQueue(interaction.guild, {
+		metadata: interaction.channel,
+		autoSelfDeaf: false
+	})
         if(!queue.connection) await queue.connect(interaction.member.voice.channel)
 
         let embed = new EmbedBuilder()
@@ -191,6 +199,28 @@ client.on("interactionCreate", async interaction=>{
             embeds: [embed]
         })
     }
+	//delete update
+    else if(commandName === 'delete')
+    {
+	 const queue = client.player.getQueue(interaction.guildId)
+	 if(!queue || !queue.playing)
+        {
+            return await interaction.reply("such empty")
+        }
+	const songNumber = (interaction.options.getNumber("song") || queue.tracks.length)-1
+	if(songNumber >= queue.tracks.length) return await interaction.reply(`Too high bozo`)
+	const currentSong = queue.tracks[songNumber]
+	queue.tracks.splice(songNumber, 1)
+	await interaction.reply({
+            embeds: [
+                new EmbedBuilder()
+                    .setDescription(`${currentSong.title} has been deleted from queue. `)
+                    .setThumbnail(currentSong.thumbnail)
+            ]
+        })
+	
+    }
+	//end delete update
     else if(commandName === 'queue')
     {
         const queue = client.player.getQueue(interaction.guildId)
@@ -198,7 +228,6 @@ client.on("interactionCreate", async interaction=>{
         {
             return await interaction.reply("such empty")
         }
-
         const TotalPages = Math.ceil(queue.tracks.length / 10) || 1
         const page = (interaction.options.getNumber("page") || 1)-1
 
