@@ -9,7 +9,7 @@ dotenv.config();
 const TOKEN = process.env.TOKEN;
 
 const CLIENT_ID = "1023352920781099028";
-const GUILD_ID = "931204087293304902";
+const GUILD_ID = "338112348994666507";
 
 //Init client
 const client = new Client({
