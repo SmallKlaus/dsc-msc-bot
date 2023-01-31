@@ -8,7 +8,7 @@ const {REST} = require("@discordjs/rest")
 dotenv.config();
 const TOKEN = process.env.TOKEN;
 
-const CLIENT_ID = "1023352920781099028";
+const CLIENT_ID = "1023352**********28"; //Discord Dev Client ID
 const GUILD_ID = "338112348994666507";
 
 //Init client
